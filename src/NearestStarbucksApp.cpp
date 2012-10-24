@@ -1,5 +1,7 @@
 #include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
+#include "Resources.h"
+//#include "Quadtree.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -15,6 +17,15 @@ class NearestStarbucksApp : public AppBasic {
 
 void NearestStarbucksApp::setup()
 {
+//	Quadtree t;
+	ifstream in("Starbucks_2006.csv");
+	string line;
+	getline(in,line);
+	in.get();
+	double d;
+	in >> d;
+	double d1;
+	in >> d1;
 }
 
 void NearestStarbucksApp::mouseDown( MouseEvent event )
