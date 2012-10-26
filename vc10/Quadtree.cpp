@@ -5,5 +5,5 @@ void Quadtree::build(Entry* c, int n){
 }
 
 Entry* Quadtree::getNearest(double x, double y){
-
+	return 0;
 }
