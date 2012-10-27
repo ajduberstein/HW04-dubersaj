@@ -1,7 +1,8 @@
 #include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
 #include "Resources.h"
-//#include "Quadtree.h"
+#include "Quadtree.h"
+#include <vector>
 
 using namespace ci;
 using namespace ci::app;
@@ -23,21 +24,27 @@ void NearestStarbucksApp::setup()
 	std::ifstream ifs(path.c_str());
     std::string t;
 	int n = 0;
+	vector<Entry> locations;
 	while(safeGetline(ifs, t)){
 		console() << t << std::endl;
 		if (t.length() > 1){
 			++n;
 		}
-		else{
+		else{ 
 			break;
 		}
+		Entry e;
+		e.identifier =  t.substr(0, t.find_first_of(","));
+		e.x = atof(t.substr(t.find(",")+1, t.rfind(",") - t.find(",")-1).c_str());
+		e.y = atof(t.substr(t.find_last_of(",")+1,t.length() - t.rfind(",")).c_str());
+		console() << e.y << std::endl;
 	}
 	console() << n << std::endl;
 }
 
 /**
  *Credit to http://stackoverflow.com/questions/6089231/getting-std-ifstream-to-handle-lf-cr-and-crlf
- *for this cross-platform solution for reading characters
+ *for this cross-platform solution for file-reading
  */
 std::istream& NearestStarbucksApp::safeGetline(std::istream& is, std::string& t)
 {
