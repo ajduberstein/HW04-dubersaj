@@ -2,30 +2,26 @@
 #include "Resources.h"
 
 class Quadtree{
+	static const int node_capacity = 4;
 	public:
-		struct Point{
-			double x;
-			double y;
-		};
-		struct BoundingBox{
-			Point center;
-			Point halfDimension;
-			BoundingBox construct(Point c, Point hd) {
-				center = c;
-				halfDimension = hd;
-			}
-			bool containsPoint(Point p) {
-				
-			}
-		};
 		void build(Entry* c, int n);
-		Entry* getNearest(double x, double y);
+		Entry* getnearest(double x, double y);
+		void subdivide();
+		//Getters and setters
+		void setEntry();
+		void setNorthWest(Quadtree* t);
+		void setNorthEast(Quadtree* t);
+		void setSouthWest(Quadtree* t);
+		void setSouthEast(Quadtree* t);
+		Entry* getEntry();
+		Quadtree* getNorthWest();
+		Quadtree* getNorthEast();
+		Quadtree* getSouthWest();
+		Quadtree* getSouthEast();
 	private:
-//		const int NODE_CAPACITY = 4;
 		Quadtree* northWest;
 		Quadtree* northEast;
 		Quadtree* southWest;
 		Quadtree* southEast;
-		BoundingBox area;
-		Point p;
+		Entry location;
 };
