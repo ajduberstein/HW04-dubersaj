@@ -6,9 +6,8 @@ void Quadtree::build(Entry* c, int n){
 	double x_centroid = 0;
 	double y_centroid = 0;
 	for (int i = 0; i < n; i++){
-		x_centroid += c->x;
-		y_centroid += c->y;
-		c++;
+		x_centroid += c[i]->x;
+		y_centroid += c[i]->y;
 	}
 	x_centroid /= n;
 	y_centroid /= n;
@@ -18,7 +17,32 @@ void Quadtree::build(Entry* c, int n){
 	//Using the centroid, constructs the quadtree
 	Quadtree t = new Quadtree();
 	t.setEntry(centroid);
-	
+	for (int i = 0; i < n; i++){
+		if(c[i].y > centroid.y){
+			if(c[i].x <= centroid.x)
+				if(!occupied)
+					northWest->location = c[i];
+				else
+					northWest.subdivide();
+			else
+				if(!occupied)
+					northEast->location = c[i];
+				else
+					northEast.subdivide();
+		}
+		else{
+			if(c[i].x <= centroid.x)
+				if(!occupied)
+			        	southWest->location = c[i];
+				else
+					southWest.subdivide();
+			else
+				if(!occupied)
+					southEast->location = c[i];
+				else
+					southEast.subdivide();	
+		}
+	}	
 }
 
 void Quadtree::subdivide(){
@@ -29,7 +53,7 @@ Entry* Quadtree::getNearest(double x, double y){
 	return 0;
 }
 
-//Getters for directional nodes
+//Getters
 Quadtree* Quadtree::getNorthWest(){
 	return northWest;
 }

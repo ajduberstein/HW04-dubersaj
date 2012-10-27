@@ -2,13 +2,12 @@
 #include "Resources.h"
 
 class Quadtree{
-	static const int node_capacity = 4;
 	public:
 		void build(Entry* c, int n);
 		Entry* getnearest(double x, double y);
 		void subdivide();
 		//Getters and setters
-		void setEntry();
+		void setEntry(Entry* e);
 		void setNorthWest(Quadtree* t);
 		void setNorthEast(Quadtree* t);
 		void setSouthWest(Quadtree* t);
@@ -24,4 +23,5 @@ class Quadtree{
 		Quadtree* southWest;
 		Quadtree* southEast;
 		Entry location;
+		bool occupied;
 };
