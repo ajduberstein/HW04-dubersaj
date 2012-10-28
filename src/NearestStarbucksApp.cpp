@@ -38,7 +38,6 @@ void NearestStarbucksApp::setup()
 	Entry* entries = new Entry[len+1];
 	t = "Temporary text";
 	while(safeGetline(ifs2, t)){
-//		console() << t << std::endl;
 		if (t.length() > 1){
 			n++;
 		}
@@ -49,8 +48,6 @@ void NearestStarbucksApp::setup()
 		entries[n].x = atof(t.substr(t.find(",")+1, t.rfind(",") - t.find(",")-1).c_str());
 		entries[n].y = atof(t.substr(t.find_last_of(",")+1,t.length() - t.rfind(",")).c_str());
 	}
-	for(int i = 0; i < len; i++)
-		console() << entries[i].identifier << std::endl;
 	tree = new Quadtree();
 	tree->build(entries, n);
 }

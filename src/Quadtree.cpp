@@ -1,13 +1,16 @@
 #include "Starbucks.h"
 #include "Quadtree.h"
+#include <algorithm>
 
 void Quadtree::build(Entry* c, int n){
 	//Computes the centroid
+	Entry* entries = new Entry[n];
+	std::copy(c,c+n,entries);
 	double x_centroid = 0;
 	double y_centroid = 0;
-	for (int i = 0; i < n; i++){
-		x_centroid += c[i].x;
-		y_centroid += c[i].y;
+	for (int i = 1; i <= n; i++){
+		x_centroid += entries[i].x;
+		y_centroid += entries[i].y;
 	}
 	x_centroid /= n;
 	y_centroid /= n;
@@ -18,13 +21,15 @@ void Quadtree::build(Entry* c, int n){
 	Quadtree* root = new Quadtree();
 	Quadtree* tmp = new Quadtree();
 	root->setEntry(&centroid);
-	for (int i = 0; i < n; i++){
-		tmp->setEntry(&c[i]);
+	for (int i = 1; i <= n; i++){
+		tmp->setEntry(&entries[i]);
 		subdivide(tmp,root);
 	}
+	delete entries;
 }
 
 void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point){
+	
 	if(inserted_point->getEntry()->y > current_point->getEntry()->y)
 	{
 		if(inserted_point->getEntry()->x <= current_point->getEntry()->x)
