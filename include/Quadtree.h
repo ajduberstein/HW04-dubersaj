@@ -23,5 +23,4 @@ class Quadtree{
 		Quadtree* southWest;
 		Quadtree* southEast;
 		Entry* location;
-		bool occupied;
 };

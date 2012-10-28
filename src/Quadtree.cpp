@@ -33,16 +33,14 @@ void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point){
 	if(inserted_point->getEntry()->y > current_point->getEntry()->y)
 	{
 		if(inserted_point->getEntry()->x <= current_point->getEntry()->x)
-			if(!(northWest->occupied)){
+			if(current_point->northWest == NULL){
 				current_point->northWest = inserted_point;
-				northWest->occupied = true;
 			}
 			else
 				subdivide(inserted_point, current_point->northWest);
 		else
-			if(!(northEast->occupied)){
+			if(current_point->northEast == NULL){
 				current_point->northEast = inserted_point;
-				northEast->occupied = true;
 			}
 			else
 				subdivide(inserted_point, current_point->northEast);
@@ -50,22 +48,20 @@ void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point){
 	else if(inserted_point->getEntry()->y <= current_point->getEntry()->y)
 	{
 		if(inserted_point->getEntry()->x <= current_point->getEntry()->x)
-			if(!(southWest->occupied)){
+			if(current_point->southWest == NULL){
 				current_point->southWest = inserted_point;
-				southWest->occupied = true;
 			}
 			else
 				subdivide(inserted_point, current_point->southWest);
 		else
-			if(!(southEast->occupied)){
+			if(current_point->southEast == NULL){
 				current_point->southEast = inserted_point;
-				southEast->occupied = true;
 			}
 			else
 				subdivide(inserted_point, current_point->southEast);
 	}
 	else{
-		//Exception goes here
+		string s = "If I show up in the debugger, there's an error.";
 	}
 }
 
