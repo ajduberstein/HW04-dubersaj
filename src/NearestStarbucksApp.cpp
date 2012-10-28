@@ -34,11 +34,13 @@ void NearestStarbucksApp::setup()
 			break;
 		}
 	}
-	Entry* entries = new Entry[len];
-	while(safeGetline(ifs, t)){
+	std::ifstream ifs2(path.c_str());
+	Entry* entries = new Entry[len+1];
+	t = "Temporary text";
+	while(safeGetline(ifs2, t)){
 //		console() << t << std::endl;
 		if (t.length() > 1){
-			++n;
+			n++;
 		}
 		else{ 
 			break;
@@ -46,7 +48,6 @@ void NearestStarbucksApp::setup()
 		entries[n].identifier =  t.substr(0, t.find_first_of(","));
 		entries[n].x = atof(t.substr(t.find(",")+1, t.rfind(",") - t.find(",")-1).c_str());
 		entries[n].y = atof(t.substr(t.find_last_of(",")+1,t.length() - t.rfind(",")).c_str());
-		console() << entries[n].identifier << std::endl;
 	}
 	for(int i = 0; i < len; i++)
 		console() << entries[i].identifier << std::endl;
