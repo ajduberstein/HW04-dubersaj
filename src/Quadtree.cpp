@@ -6,8 +6,8 @@ void Quadtree::build(Entry* c, int n){
 	double x_centroid = 0;
 	double y_centroid = 0;
 	for (int i = 0; i < n; i++){
-		x_centroid += c[i]->x;
-		y_centroid += c[i]->y;
+		x_centroid += c[i].x;
+		y_centroid += c[i].y;
 	}
 	x_centroid /= n;
 	y_centroid /= n;
@@ -15,38 +15,53 @@ void Quadtree::build(Entry* c, int n){
 	centroid.x = x_centroid;
 	centroid.y = y_centroid;
 	//Using the centroid, constructs the quadtree
-	Quadtree t = new Quadtree();
-	t.setEntry(centroid);
+	Quadtree* root = new Quadtree();
+	Quadtree* tmp = new Quadtree();
+	root->setEntry(&centroid);
 	for (int i = 0; i < n; i++){
-		if(c[i].y > centroid.y){
-			if(c[i].x <= centroid.x)
-				if(!occupied)
-					northWest->location = c[i];
-				else
-					northWest.subdivide();
-			else
-				if(!occupied)
-					northEast->location = c[i];
-				else
-					northEast.subdivide();
-		}
-		else{
-			if(c[i].x <= centroid.x)
-				if(!occupied)
-			        	southWest->location = c[i];
-				else
-					southWest.subdivide();
-			else
-				if(!occupied)
-					southEast->location = c[i];
-				else
-					southEast.subdivide();	
-		}
-	}	
+		tmp->setEntry(&c[i]);
+		subdivide(tmp,root);
+	}
 }
 
-void Quadtree::subdivide(){
-
+void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point){
+	if(inserted_point->getEntry()->y > current_point->getEntry()->y)
+	{
+		if(inserted_point->getEntry()->x <= current_point->getEntry()->x)
+			if(!(northWest->occupied)){
+				current_point->northWest = inserted_point;
+				northWest->occupied = true;
+			}
+			else
+				subdivide(inserted_point, current_point->northWest);
+		else
+			if(!(northEast->occupied)){
+				current_point->northEast = inserted_point;
+				northEast->occupied = true;
+			}
+			else
+				subdivide(inserted_point, current_point->northEast);
+	}
+	else if(inserted_point->getEntry()->y <= current_point->getEntry()->y)
+	{
+		if(inserted_point->getEntry()->x <= current_point->getEntry()->x)
+			if(!(southWest->occupied)){
+				current_point->southWest = inserted_point;
+				southWest->occupied = true;
+			}
+			else
+				subdivide(inserted_point, current_point->southWest);
+		else
+			if(!(southEast->occupied)){
+				current_point->southEast = inserted_point;
+				southEast->occupied = true;
+			}
+			else
+				subdivide(inserted_point, current_point->southEast);
+	}
+	else{
+		//Exception goes here
+	}
 }
 
 Entry* Quadtree::getNearest(double x, double y){

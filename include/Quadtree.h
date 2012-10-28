@@ -4,8 +4,8 @@
 class Quadtree{
 	public:
 		void build(Entry* c, int n);
-		Entry* getnearest(double x, double y);
-		void subdivide();
+		Entry* getNearest(double x, double y);
+		void subdivide(Quadtree* inserted_point, Quadtree* current_point);
 		//Getters and setters
 		void setEntry(Entry* e);
 		void setNorthWest(Quadtree* t);
@@ -22,6 +22,6 @@ class Quadtree{
 		Quadtree* northEast;
 		Quadtree* southWest;
 		Quadtree* southEast;
-		Entry location;
+		Entry* location;
 		bool occupied;
 };

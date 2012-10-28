@@ -15,31 +15,43 @@ class NearestStarbucksApp : public AppBasic {
 	void update();
 	void draw();
 	std::istream& safeGetline(std::istream& is, std::string& t);
+  private:
+	  Quadtree* tree;
 };
 
 void NearestStarbucksApp::setup()
 {
-//	Quadtree t;
 	std::string path = "Starbucks_2006.csv";
 	std::ifstream ifs(path.c_str());
     std::string t;
 	int n = 0;
-	vector<Entry> locations;
+	int len = 0;
 	while(safeGetline(ifs, t)){
-		console() << t << std::endl;
+		if (t.length() > 1){
+			++len;
+		}
+		else{
+			break;
+		}
+	}
+	Entry* entries = new Entry[len];
+	while(safeGetline(ifs, t)){
+//		console() << t << std::endl;
 		if (t.length() > 1){
 			++n;
 		}
 		else{ 
 			break;
 		}
-		Entry e;
-		e.identifier =  t.substr(0, t.find_first_of(","));
-		e.x = atof(t.substr(t.find(",")+1, t.rfind(",") - t.find(",")-1).c_str());
-		e.y = atof(t.substr(t.find_last_of(",")+1,t.length() - t.rfind(",")).c_str());
-		console() << e.y << std::endl;
+		entries[n].identifier =  t.substr(0, t.find_first_of(","));
+		entries[n].x = atof(t.substr(t.find(",")+1, t.rfind(",") - t.find(",")-1).c_str());
+		entries[n].y = atof(t.substr(t.find_last_of(",")+1,t.length() - t.rfind(",")).c_str());
+		console() << entries[n].identifier << std::endl;
 	}
-	console() << n << std::endl;
+	for(int i = 0; i < len; i++)
+		console() << entries[i].identifier << std::endl;
+	tree = new Quadtree();
+	tree->build(entries, n);
 }
 
 /**
