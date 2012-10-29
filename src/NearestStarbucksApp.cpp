@@ -49,7 +49,14 @@ void NearestStarbucksApp::setup()
 		entries[n].y = atof(t.substr(t.find_last_of(",")+1,t.length() - t.rfind(",")).c_str());
 	}
 	tree = new Quadtree();
-	tree->build(entries, n);
+	tree->build(entries, n+1);
+	if (tree->getSouthWest() == NULL){
+		console() << "HOW" << std::endl;
+	}
+	while(tree->getNorthEast() != NULL){
+		console() << tree->getEntry()->identifier << std::endl;
+	}
+	//tree->getNearest(.4,.4);
 }
 
 /**

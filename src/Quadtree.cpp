@@ -15,6 +15,7 @@ void Quadtree::build(Entry* c, int n){
 	x_centroid /= n;
 	y_centroid /= n;
 	Entry centroid;
+	centroid.identifier = "CENTROID";
 	centroid.x = x_centroid;
 	centroid.y = y_centroid;
 	//Using the centroid, constructs the quadtree
@@ -41,7 +42,8 @@ void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point)
 			{
 				if(current_point->northWest == NULL)
 				{
-					current_point->setNorthWest(inserted_point);
+					current_point->northWest = new Quadtree();
+					memcpy(&current_point->northWest->location,&inserted_point->location,sizeof(Entry*));
 				}
 				else
 				{
@@ -52,7 +54,8 @@ void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point)
 			{
 				if(current_point->northEast == NULL)
 				{
-					current_point->setNorthEast(inserted_point);
+					current_point->northEast = new Quadtree();
+					memcpy(&(current_point->northEast->location),&inserted_point->location,sizeof(Entry*));
 				}
 				else
 				{
@@ -67,7 +70,8 @@ void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point)
 			{
 				if(current_point->southWest == NULL)
 				{
-					current_point->setSouthWest(inserted_point);
+					current_point->southWest = new Quadtree();
+					memcpy(&(current_point->southWest->location),&inserted_point->location,sizeof(Entry*));
 				}
 				else
 				{
@@ -78,7 +82,8 @@ void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point)
 			{
 				if(current_point->southEast == NULL)
 				{
-					current_point->setSouthEast(inserted_point);
+					current_point->southEast = new Quadtree();
+					memcpy(&(current_point->southEast->location),&inserted_point->location,sizeof(Entry*));
 				}
 				else
 				{
@@ -95,8 +100,65 @@ void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point)
 	}
 }
 
-Entry* Quadtree::getNearest(double x, double y){
-	return 0;
+Entry* Quadtree::getNearest(double x, double y)
+{
+	//North points
+	if(getEntry()->y > y)
+	{
+		if(getEntry()->x <= x)
+		{
+			if (getNorthWest() != NULL)
+			{
+				getNorthWest()->getNearest(x,y);
+			}
+			else
+			{
+				return getEntry();
+			}
+		}
+		else
+		{
+			if (getNorthEast() != NULL)
+			{
+				getNorthEast()->getNearest(x,y);
+			}
+			else
+			{
+				return getEntry();
+			}
+			
+		}
+	}
+	//South points
+	else if(getEntry()->y <= getEntry()->y)
+	{
+		if(getEntry()->x <= x)
+		{
+			if (getSouthWest() != NULL)
+			{
+				getSouthWest()->getNearest(x,y);
+			}
+			else
+			{
+				return getEntry();
+			}
+		}
+		else
+		{
+			if (getSouthEast() != NULL)
+			{
+				getSouthEast()->getNearest(x,y);
+			}
+			else
+			{
+				return getEntry();
+			}
+		}
+	}
+	else
+	{
+		return 0;	
+	}
 }
 
 //Getters
