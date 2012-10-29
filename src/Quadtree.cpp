@@ -26,6 +26,7 @@ void Quadtree::build(Entry* c, int n){
 		tmp->setEntry(&entries[i]);
 		subdivide(tmp,root);
 	}
+	memcpy(this,root,sizeof(Quadtree));
 	delete[] entries;
 }
 
