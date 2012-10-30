@@ -1,7 +1,7 @@
 #include "Starbucks.h"
 #include "Resources.h"
 
-class Quadtree{
+class Quadtree : public Starbucks{
 	public:
 		void build(Entry* c, int n);
 		Entry* getNearest(double x, double y);
@@ -17,10 +17,12 @@ class Quadtree{
 		Quadtree* getNorthEast();
 		Quadtree* getSouthWest();
 		Quadtree* getSouthEast();
+		Quadtree* getRoot();
 	private:
 		Quadtree* northWest;
 		Quadtree* northEast;
 		Quadtree* southWest;
 		Quadtree* southEast;
+		Quadtree* root;
 		Entry* location;
 };

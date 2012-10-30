@@ -19,15 +19,14 @@ void Quadtree::build(Entry* c, int n){
 	centroid.x = x_centroid;
 	centroid.y = y_centroid;
 	//Using the centroid, constructs the quadtree
-	Quadtree* root = new Quadtree();
+	root = new Quadtree();
 	Quadtree* tmp = new Quadtree();
 	root->setEntry(&centroid);
 	for (int i = 1; i <= n; i++){
 		tmp->setEntry(&entries[i]);
 		subdivide(tmp,root);
 	}
-	memcpy(this,root,sizeof(Quadtree));
-	delete[] entries;
+	//delete[] entries;
 }
 
 void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point)
@@ -101,64 +100,89 @@ void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point)
 	}
 }
 
+//Query 
 Entry* Quadtree::getNearest(double x, double y)
 {
-	//North points
-	if(getEntry()->y > y)
+	//Code from www.stackoverflow.com/%2Fquestions%2F10745733%2Fnext-iteration-in-z-order-curve&ei=HyOPULr4K4uq0AHIjIG4Cw&usg=AFQjCNEVWeNgOmHP935rJke1Q8qDKT-Fqw
+	int carry = 1;
+	do
 	{
-		if(getEntry()->x <= x)
+		int newcarry = x & carry;
+		x ^= carry;
+		carry = newcarry;
+		newcarry = (y & carry) << 1;
+		y ^= carry;
+		carry = newcarry;
+	} while (carry != 0);
+	//If we have a branch, see if one of the branches has a location close to the given point
+	if(getNorthWest() != NULL || getNorthEast() != NULL || getSouthWest() != NULL || getSouthEast() != NULL)
+	{
+		//North points
+		if(getEntry()->y > y)
 		{
-			if (getNorthWest() != NULL)
+			//Northwest points
+			if(getEntry()->x <= x)
 			{
-				getNorthWest()->getNearest(x,y);
+				if (getNorthWest() != NULL)
+				{
+					getNorthWest()->getNearest(x,y);
+				}
+				else
+				{
+					return getEntry();
+				}
+			}
+			//Otherwise, Northeast points
+			else
+			{
+				if (getNorthEast() != NULL)
+				{
+					getNorthEast()->getNearest(x,y);
+				}
+				else
+				{
+					return getEntry();
+				}
+			}
+		}
+		//South points
+		else if(getEntry()->y <= getEntry()->y)
+		{
+			if(getEntry()->x <= x)
+			{
+				if (getSouthWest() != NULL)
+				{
+					getSouthWest()->getNearest(x,y);
+				}
+				else
+				{
+					return getEntry();
+				}
 			}
 			else
 			{
-				return getEntry();
+				if (getSouthEast() != NULL)
+				{
+					getSouthEast()->getNearest(x,y);
+				}
+				else
+				{
+					return getEntry();
+				}
 			}
 		}
 		else
 		{
-			if (getNorthEast() != NULL)
-			{
-				getNorthEast()->getNearest(x,y);
-			}
-			else
-			{
-				return getEntry();
-			}
-			
+			return 0;	
 		}
 	}
-	//South points
-	else if(getEntry()->y <= getEntry()->y)
-	{
-		if(getEntry()->x <= x)
-		{
-			if (getSouthWest() != NULL)
-			{
-				getSouthWest()->getNearest(x,y);
-			}
-			else
-			{
-				return getEntry();
-			}
-		}
-		else
-		{
-			if (getSouthEast() != NULL)
-			{
-				getSouthEast()->getNearest(x,y);
-			}
-			else
-			{
-				return getEntry();
-			}
-		}
+	//Otherwise, if we're at the centroid root, move up to a node with concrete branches
+	else if (getRoot() != NULL){
+		return getRoot()->getNearest(x,y);
 	}
-	else
-	{
-		return 0;	
+	//In this case, we're not at the root and we have no further branches, so this must be a leaf.
+	else{
+		return getEntry();
 	}
 }
 
@@ -177,6 +201,9 @@ Quadtree* Quadtree::getSouthEast(){
 }
 Entry* Quadtree::getEntry(){
 	return location;
+}
+Quadtree* Quadtree::getRoot(){
+	return root;
 }
 
 //Setters for directional nodes
