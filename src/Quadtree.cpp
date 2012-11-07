@@ -2,6 +2,15 @@
 #include "Quadtree.h"
 #include <algorithm>
 
+Quadtree::Quadtree(){
+	northEast = NULL;
+	northWest = NULL;
+	southEast = NULL;
+	southWest = NULL;
+	root = NULL;
+	location = NULL;
+}
+
 void Quadtree::build(Entry* c, int n){
 	//Computes the centroid
 	Entry* entries = new Entry[n];
@@ -26,7 +35,7 @@ void Quadtree::build(Entry* c, int n){
 		tmp->setEntry(&entries[i]);
 		subdivide(tmp,root);
 	}
-	//delete[] entries;
+	delete[] entries;
 }
 
 void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point)
@@ -103,17 +112,6 @@ void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point)
 //Query 
 Entry* Quadtree::getNearest(double x, double y)
 {
-	//Code from www.stackoverflow.com/%2Fquestions%2F10745733%2Fnext-iteration-in-z-order-curve&ei=HyOPULr4K4uq0AHIjIG4Cw&usg=AFQjCNEVWeNgOmHP935rJke1Q8qDKT-Fqw
-	int carry = 1;
-	do
-	{
-		int newcarry = x & carry;
-		x ^= carry;
-		carry = newcarry;
-		newcarry = (y & carry) << 1;
-		y ^= carry;
-		carry = newcarry;
-	} while (carry != 0);
 	//If we have a branch, see if one of the branches has a location close to the given point
 	if(getNorthWest() != NULL || getNorthEast() != NULL || getSouthWest() != NULL || getSouthEast() != NULL)
 	{

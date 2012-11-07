@@ -3,6 +3,7 @@
 
 class Quadtree : public Starbucks{
 	public:
+		Quadtree();
 		void build(Entry* c, int n);
 		Entry* getNearest(double x, double y);
 		void subdivide(Quadtree* inserted_point, Quadtree* current_point);
