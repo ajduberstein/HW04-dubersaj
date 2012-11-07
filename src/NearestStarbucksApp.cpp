@@ -50,8 +50,8 @@ void NearestStarbucksApp::setup()
 	}
 	tree = new Quadtree();
 	tree->build(entries, n+1);
-	console() << tree->getRoot()->getNorthWest()->getEntry()->identifier << std::endl;
-	console() << tree->getNearest(.4,.4)->identifier << std::endl;
+	//console() << tree->getRoot()->getNorthWest()->getEntry()->identifier << std::endl;
+	//console() << tree->getNearest(.4,.4)->identifier << std::endl;
 }
 
 /**

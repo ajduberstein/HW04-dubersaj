@@ -35,7 +35,6 @@ void Quadtree::build(Entry* c, int n){
 		tmp->setEntry(&entries[i]);
 		subdivide(tmp,root);
 	}
-	delete[] entries;
 }
 
 void Quadtree::subdivide(Quadtree* inserted_point, Quadtree* current_point)
