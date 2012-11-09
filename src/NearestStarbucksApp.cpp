@@ -1,4 +1,6 @@
 #include "cinder/app/AppBasic.h"
+#include "cinder/ImageIo.h"
+#include "cinder/gl/Texture.h"
 #include "cinder/gl/gl.h"
 #include "Resources.h"
 #include "Quadtree.h"
@@ -13,11 +15,20 @@ class NearestStarbucksApp : public AppBasic {
 	void setup();
 	void mouseDown( MouseEvent event );	
 	void update();
+	void prepareSettings(Settings *settings);
 	void draw();
 	std::istream& safeGetline(std::istream& is, std::string& t);
   private:
 	  Quadtree* tree;
+	  gl::Texture mImage;
 };
+
+void NearestStarbucksApp::prepareSettings(Settings *settings){
+	settings->setWindowSize(800, 600);
+	settings->setFrameRate(60.0f);
+	settings->setResizable(false);
+	settings->setFullScreen(false);
+}
 
 void NearestStarbucksApp::setup()
 {
@@ -37,6 +48,7 @@ void NearestStarbucksApp::setup()
 	std::ifstream ifs2(path.c_str());
 	Entry* entries = new Entry[len+1];
 	t = "Temporary text";
+	//Import Starbucks Locations file
 	while(safeGetline(ifs2, t)){
 		if (t.length() > 1){
 			n++;
@@ -48,10 +60,16 @@ void NearestStarbucksApp::setup()
 		entries[n].x = atof(t.substr(t.find(",")+1, t.rfind(",") - t.find(",")-1).c_str());
 		entries[n].y = atof(t.substr(t.find_last_of(",")+1,t.length() - t.rfind(",")).c_str());
 	}
+	//Load locations to a data structure
 	tree = new Quadtree();
 	tree->build(entries, n+1);
-	//console() << tree->getRoot()->getNorthWest()->getEntry()->identifier << std::endl;
-	//console() << tree->getNearest(.4,.4)->identifier << std::endl;
+	//Test to make sure the data structure established
+	console() << tree->getRoot()->getNorthWest()->getEntry()->identifier << std::endl;
+	console() << tree->getNearest(.4,.4)->identifier << std::endl;
+	//Test to make sure resource is in assets folder
+	console() << "US Picture at " << getAssetPath("USA.jpg") << std::endl;
+//	Surface processedImage( loadImage( loadResource( RES_USA ) ) );
+	mImage = gl::Texture(loadImage(loadResource(RES_USA)));
 }
 
 /**
@@ -98,8 +116,8 @@ void NearestStarbucksApp::update()
 
 void NearestStarbucksApp::draw()
 {
-	// clear out the window with black
-	gl::clear( Color( 0, 0, 0 ) ); 
+//	gl::clear( Color( 0, 0, 0 ) ); 
+	gl::draw(mImage);
 }
 
 CINDER_APP_BASIC( NearestStarbucksApp, RendererGl )
