@@ -104,19 +104,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\List.cpp" />
     <ClCompile Include="..\src\NearestStarbucksApp.cpp" />
-    <ClCompile Include="..\src\Quadtree.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\include\Quadtree.h" />
-    <ClInclude Include="..\include\Resources.h" />
-    <ClInclude Include="..\include\Starbucks.h" />
+    <ClCompile Include="..\src\Starbucks_Sonodabe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\USA.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\KDTree.h" />
+    <ClInclude Include="..\include\List.h" />
+    <ClInclude Include="..\include\Node.h" />
+    <ClInclude Include="..\include\Resources.h" />
+    <ClInclude Include="..\include\Starbucks.h" />
+    <ClInclude Include="..\include\Starbucks_Sonodabe.h" />
+    <ClInclude Include="..\include\TreeNode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

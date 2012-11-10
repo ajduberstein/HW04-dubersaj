@@ -3,8 +3,15 @@
 #include "cinder/gl/Texture.h"
 #include "cinder/gl/gl.h"
 #include "Resources.h"
-#include "Quadtree.h"
+#include "KDTree.h"
 #include <vector>
+#include "cinder/app/AppBasic.h"
+#include "cinder/gl/gl.h"
+#include "Starbucks_Sonodabe.h"
+#include "cinder/gl/Texture.h"
+#include <iostream>
+#include <fstream>
+#include <time.h>
 
 using namespace ci;
 using namespace ci::app;
@@ -19,8 +26,9 @@ class NearestStarbucksApp : public AppBasic {
 	void draw();
 	std::istream& safeGetline(std::istream& is, std::string& t);
   private:
-	  Quadtree* tree;
+	  Starbucks_Sonodabe* tree;
 	  gl::Texture mImage;
+	  Entry* entries;
 };
 
 void NearestStarbucksApp::prepareSettings(Settings *settings){
@@ -46,8 +54,14 @@ void NearestStarbucksApp::setup()
 		}
 	}
 	std::ifstream ifs2(path.c_str());
-	Entry* entries = new Entry[len+1];
+	entries = new Entry[len+1];
 	t = "Temporary text";
+	/*
+	Pixels will be placed from the entries array on a surface. We might have to invert the y. 1 - decimal_values
+	Check if there's a population growth area around
+	If so, for every increment of population growth, add a degree of red color change
+
+	*/
 	//Import Starbucks Locations file
 	while(safeGetline(ifs2, t)){
 		if (t.length() > 1){
@@ -61,10 +75,13 @@ void NearestStarbucksApp::setup()
 		entries[n].y = atof(t.substr(t.find_last_of(",")+1,t.length() - t.rfind(",")).c_str());
 	}
 	//Load locations to a data structure
-	tree = new Quadtree();
-	tree->build(entries, n+1);
+	tree = new Starbucks_Sonodabe();
+	tree->build(entries, n);
+	for(int i = 0; i < n+1; i++){
+		
+	}
 	//Test to make sure the data structure established
-	console() << tree->getRoot()->getNorthWest()->getEntry()->identifier << std::endl;
+	console() << tree->tree->root->data->identifier << std::endl;
 	console() << tree->getNearest(.4,.4)->identifier << std::endl;
 	//Test to make sure resource is in assets folder
 	console() << "US Picture at " << getAssetPath("USA.jpg") << std::endl;
