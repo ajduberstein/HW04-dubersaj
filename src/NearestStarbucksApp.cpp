@@ -215,7 +215,7 @@ void NearestStarbucksApp::keyDown(KeyEvent event){
 }
 
 void NearestStarbucksApp::render(){
-	string txt = "Starbucks Visualizer\n Green saturation represents population in 2000. \n Red saturation represents population in 2010. \n Intermediate colors represent areas of change.\n Pale areas represent changes in regional person/Starbucks density.";
+	string txt = "Starbucks Visualizer\n Green saturation represents population in 2000. \n Red saturation represents population in 2010. \n Intermediate colors represent areas of change.\n Pale areas represent changes in regional person/Starbucks density. \n The redder the region, the more people in 2010. \n Press j to remove the pale spots. \n ? will toggle these instructions.";
 	TextBox tbox = TextBox().alignment( TextBox::CENTER ).font(master_font_).size( Vec2i( 512, 511) ).text( txt );
 	tbox.setColor( Color( 1.0f, 0.65f, 0.35f ) );
 	tbox.setBackgroundColor( ColorA( 0.5, 0, 0, 1 ) );
