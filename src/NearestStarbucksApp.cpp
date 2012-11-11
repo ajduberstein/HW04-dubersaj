@@ -29,6 +29,9 @@ class NearestStarbucksApp : public AppBasic {
 	  Starbucks_Sonodabe* tree;
 	  gl::Texture mImage;
 	  Entry* entries;
+	  Surface* starbucksLayer_;
+	  int list_length_;
+	  Entry* nearest_starbucks_;
 };
 
 void NearestStarbucksApp::prepareSettings(Settings *settings){
@@ -77,9 +80,6 @@ void NearestStarbucksApp::setup()
 	//Load locations to a data structure
 	tree = new Starbucks_Sonodabe();
 	tree->build(entries, n);
-	for(int i = 0; i < n+1; i++){
-		
-	}
 	//Test to make sure the data structure established
 	console() << tree->tree->root->data->identifier << std::endl;
 	console() << tree->getNearest(.4,.4)->identifier << std::endl;
@@ -87,6 +87,7 @@ void NearestStarbucksApp::setup()
 	console() << "US Picture at " << getAssetPath("USA.jpg") << std::endl;
 //	Surface processedImage( loadImage( loadResource( RES_USA ) ) );
 	mImage = gl::Texture(loadImage(loadResource(RES_USA)));
+	list_length_ = n;
 }
 
 /**
@@ -125,6 +126,18 @@ std::istream& NearestStarbucksApp::safeGetline(std::istream& is, std::string& t)
 
 void NearestStarbucksApp::mouseDown( MouseEvent event )
 {
+	if(event.isRight()){
+		console() << event.getX() << "," << event.getY() << std::endl;
+	}
+	if(event.isLeft()){
+		nearest_starbucks_ = new Entry();
+		nearest_starbucks_->x = tree->getNearest((getWindowWidth() - event.getX()*1.0f)/getWindowWidth(),(getWindowWidth() - event.getY()*1.0f)/getWindowWidth()*1.0f)->x; 
+		nearest_starbucks_->y = tree->getNearest((getWindowWidth() - event.getX()*1.0f)/getWindowWidth()*1.0f,(getWindowWidth() - event.getY()*1.0f)/getWindowWidth()*1.0f)->y; 
+		nearest_starbucks_->identifier = tree->getNearest((getWindowWidth() - event.getX()*1.0f)/getWindowWidth()*1.0f,(getWindowWidth() - event.getY()*1.0f)/getWindowWidth()*1.0f)->identifier;
+
+		console() << "The nearest Starbucks to the clicked point is listed below. " << std::endl; 
+		console() << nearest_starbucks_->identifier << std::endl;
+	}
 }
 
 void NearestStarbucksApp::update()
@@ -133,8 +146,11 @@ void NearestStarbucksApp::update()
 
 void NearestStarbucksApp::draw()
 {
-//	gl::clear( Color( 0, 0, 0 ) ); 
-	gl::draw(mImage);
+	gl::draw(mImage,Rectf(0,0,getWindowWidth(),getWindowHeight()));
+	for(int i = 0; i < list_length_; i++){
+		gl::color(0,112,74);
+		gl::drawSolidCircle(Vec2f(getWindowWidth()*entries[i].x,getWindowHeight()-getWindowHeight()*entries[i].y),2.50f,20);
+	}
 }
 
 CINDER_APP_BASIC( NearestStarbucksApp, RendererGl )
