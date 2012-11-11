@@ -1,4 +1,6 @@
+#include "cinder/Text.h"
 #include "cinder/app/AppBasic.h"
+#include "cinder/Font.h"
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/gl/gl.h"
@@ -35,7 +37,10 @@ class NearestStarbucksApp : public AppBasic {
 	void drawCircle(uint8_t* pixels, int center_x, int center_y, int r, int color_increment, bool inc_blue, bool inc_green, bool inc_red);
 	void drawCircle(uint8_t* pixels, int center_x, int center_y, int r, int red, int green, int blue); 
 	void keyDown(KeyEvent event);
+	void render();
   private:
+	 Font master_font_;
+	 gl::Texture master_texture_font_;
 	  Starbucks_Sonodabe* tree;
 	  gl::Texture mImage;
 	  Entry* entries;
@@ -45,7 +50,8 @@ class NearestStarbucksApp : public AppBasic {
 	  int list_length_;
 	  Entry* nearest_starbucks_;
 	  int filler_; 
-	  bool display_population_change_;
+	  bool display_starbucks_locations_;
+	  bool display_help;
 	  double param_;
 	  int shape_changer_;
 	  int total_population_2010;
@@ -65,7 +71,9 @@ void NearestStarbucksApp::prepareSettings(Settings *settings){
 
 void NearestStarbucksApp::setup()
 {
-	display_population_change_ = false;
+	master_font_ = Font("Helvetica",32);
+	display_starbucks_locations_ = false;
+	display_help = true;
 	param_ = 0;
 	nearest_starbucks_ = NULL;
 	std::string path = "Starbucks_2006.csv";
@@ -144,6 +152,7 @@ void NearestStarbucksApp::setup()
 	mySurface_ = new Surface(kTextureSize,kTextureSize,false);
 	createHeatMap(census_2010,216331,false,true,false);
 	createHeatMap(census_2000,206676,false,false,true);
+	render();	
 }
 
 /**
@@ -197,17 +206,26 @@ void NearestStarbucksApp::mouseDown( MouseEvent event )
 
 void NearestStarbucksApp::keyDown(KeyEvent event){
 	if( event.getChar() == 'j' ){
-		if(display_population_change_)
-			display_population_change_ = false;
-		else
-			display_population_change_ = true;
+		display_starbucks_locations_ = !(display_starbucks_locations_);
 	}
+	else if (event.getChar() == '?'){
+		display_help = !(display_help);
+	}
+	else{}
+}
+
+void NearestStarbucksApp::render(){
+	string txt = "Starbucks Visualizer\n Green saturation represents population in 2000. \n Red saturation represents population in 2010. \n Intermediate colors represent areas of change.\n Pale areas represent changes in regional person/Starbucks density.";
+	TextBox tbox = TextBox().alignment( TextBox::CENTER ).font(master_font_).size( Vec2i( 512, 511) ).text( txt );
+	tbox.setColor( Color( 1.0f, 0.65f, 0.35f ) );
+	tbox.setBackgroundColor( ColorA( 0.5, 0, 0, 1 ) );
+	master_texture_font_ = gl::Texture( tbox.render() );
 }
 
 void NearestStarbucksApp::createHeatMap(CensusEntry* entries, int len, bool inc_blue, bool inc_green, bool inc_red){
 	uint8_t* dataArray = (*mySurface_).getData();
 	for(int i = 0; i < len; i++){
-		drawCircle(dataArray, getWindowWidth()*entries[i].x, getWindowHeight()-getWindowHeight()*entries[i].y,100,50,inc_red,inc_green,inc_blue);
+		drawCircle(dataArray, getWindowWidth()*entries[i].x, getWindowHeight()-getWindowHeight()*entries[i].y,3,500*(total_population_2010 - entries[i].population)/total_population_2010,inc_red,inc_green,inc_blue);
 	}
 }
 
@@ -227,10 +245,14 @@ void NearestStarbucksApp::drawCircle(uint8_t* pixels, int center_x, int center_y
 			{
 				int curBlock = 3*(x + y*kTextureSize);
 				//Invert color by 255-current pixels
-				if (inc_red)
+				if (inc_red){
 					pixels[3*(x+y*kTextureSize)] += color_increment;
-				if (inc_green)
+					pixels[3*(x+y*kTextureSize)+1] -= color_increment;
+				}
+				if (inc_green){
 					pixels[3*(x+y*kTextureSize)+1] += color_increment;
+					pixels[3*(x+y*kTextureSize)] -= color_increment;
+				}
 				if (inc_blue)
 					pixels[3*(x+y*kTextureSize)+2] += color_increment;
 			}
@@ -285,20 +307,27 @@ void NearestStarbucksApp::draw()
 	//Colors each region based on population density, measured by people/Starbucks, satisying HW04, Phase 2, Goal F
 	//Colors each region based on change in people per Starbucks, satisying HW04, Phase 2, satisying HW04, Phase 2, Goal G
 	//Draws all 2006 Starbucks locations on the map, satisying HW04, Phase 2, Goal A.
-	for(int i = 0; i < list_length_; i++){
-		gl::enableAlphaBlending();
-		gl::color(ColorA8u(0,112,74,100));
-		gl::drawSolidCircle(Vec2f(getWindowWidth()*entries[i].x,getWindowHeight()-getWindowHeight()*entries[i].y),2.50f,40);
-	}
+	
 	if(nearest_starbucks_ != NULL){
 		gl::enableAlphaBlending();
-		gl::color(ColorA(200,10,100,100));
+		gl::color(ColorA(200,10,100,150));
 	//Highlights nearest Starbucks to clicked location, satisying HW04, Phase 2, Goal B.
 		gl::drawSolidEllipse(Vec2f(getWindowWidth()*nearest_starbucks_->x,getWindowHeight()-getWindowHeight()*nearest_starbucks_->y),13.00f*param_,14.00f*param_,3+param_);
 		gl::disableAlphaBlending();
 	}
-	if(!display_population_change_){
-
+	if(!display_starbucks_locations_){
+		for(int i = 0; i < list_length_; i++){
+			gl::enableAlphaBlending();
+			gl::color(ColorA8u(250,250,250,30));
+			gl::drawSolidCircle(Vec2f(getWindowWidth()*entries[i].x,getWindowHeight()-getWindowHeight()*entries[i].y),10,40);
+			gl::color(ColorA(200,10,100,150));
+			gl::disableAlphaBlending();
+		}
+	}
+	if (master_texture_font_ && display_help){
+		gl::enableAlphaBlending();
+		gl::color(ColorA8u(150,150,0));
+		gl::draw( master_texture_font_);
 	}
 }
 
