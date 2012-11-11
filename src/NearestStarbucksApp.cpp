@@ -142,7 +142,10 @@ void NearestStarbucksApp::setup()
 	console() << "US Picture at " << getAssetPath("USA.jpg") << std::endl;
 	mImage = gl::Texture(loadImage(loadResource(RES_USA)));
 	mySurface_ = new Surface(kTextureSize,kTextureSize,false);
+	createHeatMap(census_2010,216331,false,true,false);
+	createHeatMap(census_2000,206676,false,false,true);
 }
+
 /**
  *Credit to http://stackoverflow.com/questions/6089231/getting-std-ifstream-to-handle-lf-cr-and-crlf
  *for this cross-platform solution for file-reading
@@ -204,7 +207,7 @@ void NearestStarbucksApp::keyDown(KeyEvent event){
 void NearestStarbucksApp::createHeatMap(CensusEntry* entries, int len, bool inc_blue, bool inc_green, bool inc_red){
 	uint8_t* dataArray = (*mySurface_).getData();
 	for(int i = 0; i < len; i++){
-		drawCircle(dataArray, getWindowWidth()*entries[i].x, getWindowHeight()-getWindowHeight()*entries[i].y,5,20,inc_red,inc_green,inc_blue);
+		drawCircle(dataArray, getWindowWidth()*entries[i].x, getWindowHeight()-getWindowHeight()*entries[i].y,100,50,inc_red,inc_green,inc_blue);
 	}
 }
 
@@ -224,23 +227,12 @@ void NearestStarbucksApp::drawCircle(uint8_t* pixels, int center_x, int center_y
 			{
 				int curBlock = 3*(x + y*kTextureSize);
 				//Invert color by 255-current pixels
-				if (inc_red){
-					pixels[3*(x+y*kTextureSize)]  = 225;
-					pixels[3*(x+y*kTextureSize)+1]  = 0;
-					pixels[3*(x+y*kTextureSize)+2]  = 0;
-				}
-				if (inc_green){
-					pixels[3*(x+y*kTextureSize)]  = 0;
-					pixels[3*(x+y*kTextureSize)+1]  = 225;
-					pixels[3*(x+y*kTextureSize)+2]  = 0;
-				}
-				if (pixels[3*(x+y*kTextureSize)] > 200 && pixels[3*(x+y*kTextureSize)+1] > 200){
-					pixels[3*(x+y*kTextureSize)]  = 225;
-					pixels[3*(x+y*kTextureSize)+1]  = 225;
-					pixels[3*(x+y*kTextureSize)+2]  = 0;
-				}
-				if (inc_blue){
-				}
+				if (inc_red)
+					pixels[3*(x+y*kTextureSize)] += color_increment;
+				if (inc_green)
+					pixels[3*(x+y*kTextureSize)+1] += color_increment;
+				if (inc_blue)
+					pixels[3*(x+y*kTextureSize)+2] += color_increment;
 			}
 		}
 	}
@@ -285,6 +277,7 @@ void NearestStarbucksApp::update()
 
 void NearestStarbucksApp::draw()
 {
+	gl::clear(Color(0,0,0));
 	gl::draw(*mySurface_);
 	uint8_t* pixels = (*mySurface_).getData();
 //	gl::draw(mImage,Rectf(0,0,getWindowWidth(),getWindowHeight()));
@@ -293,20 +286,19 @@ void NearestStarbucksApp::draw()
 	//Colors each region based on change in people per Starbucks, satisying HW04, Phase 2, satisying HW04, Phase 2, Goal G
 	//Draws all 2006 Starbucks locations on the map, satisying HW04, Phase 2, Goal A.
 	for(int i = 0; i < list_length_; i++){
-		drawCircle(pixels,getWindowWidth()*entries[i].x,getWindowHeight()-getWindowHeight()*entries[i].y,10,0,112,74);
-	//	gl::drawSolidCircle(Vec2f(getWindowWidth()*entries[i].x,getWindowHeight()-getWindowHeight()*entries[i].y),2.50f,40);
-		//gl::color(ColorA8u(0,112,74,300));
-		//gl::drawSolidCircle(Vec2f(getWindowWidth()*entries[i].x,getWindowHeight()-getWindowHeight()*entries[i].y),13.00f,40);
+		gl::enableAlphaBlending();
+		gl::color(ColorA8u(0,112,74,100));
+		gl::drawSolidCircle(Vec2f(getWindowWidth()*entries[i].x,getWindowHeight()-getWindowHeight()*entries[i].y),2.50f,40);
 	}
 	if(nearest_starbucks_ != NULL){
 		gl::enableAlphaBlending();
+		gl::color(ColorA(200,10,100,100));
 	//Highlights nearest Starbucks to clicked location, satisying HW04, Phase 2, Goal B.
 		gl::drawSolidEllipse(Vec2f(getWindowWidth()*nearest_starbucks_->x,getWindowHeight()-getWindowHeight()*nearest_starbucks_->y),13.00f*param_,14.00f*param_,3+param_);
 		gl::disableAlphaBlending();
 	}
-	if(display_population_change_){
-		createHeatMap(census_2010,216331,false,true,true);
-		createHeatMap(census_2000,206676,false,false,true);
+	if(!display_population_change_){
+
 	}
 }
 
