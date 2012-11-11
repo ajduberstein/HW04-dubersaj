@@ -12,7 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include <time.h>
-
+#define PI 3.14159265
 using namespace ci;
 using namespace ci::app;
 using namespace std;
@@ -32,6 +32,9 @@ class NearestStarbucksApp : public AppBasic {
 	  Surface* starbucksLayer_;
 	  int list_length_;
 	  Entry* nearest_starbucks_;
+	  int filler_; 
+	  double param_;
+	  int shape_changer_;
 };
 
 void NearestStarbucksApp::prepareSettings(Settings *settings){
@@ -43,6 +46,8 @@ void NearestStarbucksApp::prepareSettings(Settings *settings){
 
 void NearestStarbucksApp::setup()
 {
+	param_ = 0;
+	nearest_starbucks_ = NULL;
 	std::string path = "Starbucks_2006.csv";
 	std::ifstream ifs(path.c_str());
     std::string t;
@@ -131,10 +136,9 @@ void NearestStarbucksApp::mouseDown( MouseEvent event )
 	}
 	if(event.isLeft()){
 		nearest_starbucks_ = new Entry();
-		nearest_starbucks_->x = tree->getNearest((getWindowWidth() - event.getX()*1.0f)/getWindowWidth(),(getWindowWidth() - event.getY()*1.0f)/getWindowWidth()*1.0f)->x; 
-		nearest_starbucks_->y = tree->getNearest((getWindowWidth() - event.getX()*1.0f)/getWindowWidth()*1.0f,(getWindowWidth() - event.getY()*1.0f)/getWindowWidth()*1.0f)->y; 
-		nearest_starbucks_->identifier = tree->getNearest((getWindowWidth() - event.getX()*1.0f)/getWindowWidth()*1.0f,(getWindowWidth() - event.getY()*1.0f)/getWindowWidth()*1.0f)->identifier;
-
+		nearest_starbucks_->x = tree->getNearest(1-(getWindowWidth()-event.getX()*1.0000f)/getWindowWidth(),(getWindowHeight()-event.getY()*1.0f)/getWindowHeight()*1.0f)->x; 
+		nearest_starbucks_->y = tree->getNearest(1-(getWindowWidth()-event.getX()*1.0000f)/getWindowWidth(),(getWindowHeight()-event.getY()*1.0f)/getWindowHeight()*1.0f)->y; 
+		nearest_starbucks_->identifier = tree->getNearest(1-(getWindowWidth()-event.getX()*1.0000f)/getWindowWidth(),(getWindowHeight()-event.getY()*1.0f)/getWindowHeight()*1.0f)->identifier; 
 		console() << "The nearest Starbucks to the clicked point is listed below. " << std::endl; 
 		console() << nearest_starbucks_->identifier << std::endl;
 	}
@@ -142,15 +146,25 @@ void NearestStarbucksApp::mouseDown( MouseEvent event )
 
 void NearestStarbucksApp::update()
 {
+	param_++;
+	shape_changer_ = sin((param_)*PI/100000);
+	if (param_>3)
+		param_ = 0;
 }
 
 void NearestStarbucksApp::draw()
 {
 	gl::draw(mImage,Rectf(0,0,getWindowWidth(),getWindowHeight()));
+	gl::color(0,112,74);
 	for(int i = 0; i < list_length_; i++){
-		gl::color(0,112,74);
-		gl::drawSolidCircle(Vec2f(getWindowWidth()*entries[i].x,getWindowHeight()-getWindowHeight()*entries[i].y),2.50f,20);
+		gl::drawSolidCircle(Vec2f(getWindowWidth()*entries[i].x,getWindowHeight()-getWindowHeight()*entries[i].y),2.50f,40);
 	}
+	if(nearest_starbucks_ != NULL){
+		gl::enableAlphaBlending();
+		gl::color(ColorA8u(174,0,174,150));
+		gl::drawSolidEllipse(Vec2f(getWindowWidth()*nearest_starbucks_->x,getWindowHeight()-getWindowHeight()*nearest_starbucks_->y),13.00f*param_,14.00f*param_,3+param_);
+	}
+		gl::disableAlphaBlending();
 }
 
 CINDER_APP_BASIC( NearestStarbucksApp, RendererGl )
