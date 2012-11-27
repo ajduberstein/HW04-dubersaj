@@ -107,6 +107,7 @@ void NearestStarbucksApp::setup()
 		entries[n].x = atof(t.substr(t.find(",")+1, t.rfind(",") - t.find(",")-1).c_str());
 		entries[n].y = atof(t.substr(t.find_last_of(",")+1,t.length() - t.rfind(",")).c_str());
 	}
+	//Credit to Brandon Sonodabe for this object.
 	tree = new Starbucks_Sonodabe();
 	tree->build(entries, n);
 	list_length_ = n;
